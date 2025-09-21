@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Next-Gen AI Mockup Studio | Professional Creative Pipeline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * { font-family: 'Inter', sans-serif; }
+        
+        :root {
+            --primary-bg: #0D1117; 
+            --secondary-bg: #010409; 
+            --card-bg: #161B22; 
+            --accent: #3B82F6; 
+            --accent-light: #60A5FA;
+            --text-primary: #E6EDF3;
+            --text-secondary: #8D96A0;
+            --text-muted: #6E7681;
+            --border: #30363D;
+            --success: #238636;
+            --warning: #F59E0B;
+            --error: #EF4444;
+        }
+        
+        body { 
+            background: radial-gradient(ellipse at top, #161B22 0%, var(--secondary-bg) 60%);
+            color: var(--text-primary);
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--secondary-bg); }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--accent); 
+            border-radius: 10px; 
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+        }
+        
+        .bento-box {
+            background: rgba(22, 27, 34, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transition: box-shadow 0.4s ease, transform 0.4s ease;
+        }
+
+        .bento-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.2), 0 0 15px rgba(59, 130, 246, 0.1);
+        }
+        
+        .upload-zone {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(96, 165, 250, 0.1) 100%);
+            border: 2px dashed rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .upload-zone:hover {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(96, 165, 250, 0.2) 100%);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(59, 130, 246, 0.2);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            animation: loading 2s ease-in-out infinite;
+        }
+        
+        @keyframes loading {
+            0%, 100% { transform: scaleX(1); }
+            50% { transform: scaleX(1.1); }
+        }
+        
+        .mockup-preview {
+            background: linear-gradient(135deg, rgba(22, 27, 34, 0.5) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border: 1px solid var(--border);
+        }
+
+        .edit-canvas {
+            cursor: crosshair;
+        }
+        
+        .palette-color {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .palette-color:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .floating-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0; }
+            50% { opacity: 1; }
+            25% { transform: translateY(-20px) translateX(10px); }
+            75% { transform: translateY(-40px) translateX(-10px); }
+        }
+        
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            border: 1px solid var(--border);
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.20.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/"
+  }
+}
+</script>
+</head>
+<body>
+    <div id="root"></div>
+</body>
+</html>
