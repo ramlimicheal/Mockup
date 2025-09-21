@@ -86,3 +86,44 @@ export const finalizeWithPrecision = (dataUrl: string, targetAspect: string, max
         img.src = dataUrl;
     });
 };
+
+export const applyPhotographicEffects = (dataUrl: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            const { canvas, ctx } = createHighQualityCanvas(img.naturalWidth, img.naturalHeight);
+            if (!ctx) return reject(new Error("Could not get canvas context"));
+
+            // 1. Apply contrast enhancement when drawing the image
+            ctx.filter = 'contrast(1.05)';
+            ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
+            ctx.filter = 'none'; // Reset filter
+
+            // 2. Add subtle film grain
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const brightness = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114) / 255;
+                const noise = (Math.random() - 0.5) * (15 * (1 - brightness)); // More noise in darker areas
+                data[i] = Math.max(0, Math.min(255, data[i] + noise));
+                data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise));
+                data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise));
+            }
+            ctx.putImageData(imageData, 0, 0);
+
+            // 3. Add a subtle vignette
+            const gradient = ctx.createRadialGradient(
+                img.naturalWidth / 2, img.naturalHeight / 2, Math.max(img.naturalWidth, img.naturalHeight) * 0.3,
+                img.naturalWidth / 2, img.naturalHeight / 2, Math.max(img.naturalWidth, img.naturalHeight) * 0.9
+            );
+            gradient.addColorStop(0, 'rgba(0,0,0,0)');
+            gradient.addColorStop(1, 'rgba(25, 20, 30, 0.18)'); // Use a slightly colored vignette for a richer feel
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, img.naturalWidth, img.naturalHeight);
+
+            resolve(canvas.toDataURL('image/png', 0.98));
+        };
+        img.onerror = reject;
+        img.src = dataUrl;
+    });
+};

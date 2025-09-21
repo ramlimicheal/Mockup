@@ -18,7 +18,7 @@ const aspectRatios: { v: AspectRatio; l: string }[] = [
 
 const qualityLevels: { v: OutputQuality; d: string }[] = [
     { v: 'HD', d: '2048px' },
-    { v: 'Pro', d: '4096px' }
+    { v: 'Pro', d: '4096px • Pro Finishing' }
 ];
 
 export const OutputSettings: React.FC<OutputSettingsProps> = ({ aspectRatio, setAspectRatio, outputQuality, setOutputQuality }) => {

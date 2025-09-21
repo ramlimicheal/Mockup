@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 // FIX: Changed import from generateArtDirections to generateCreativeDirections, as it was incorrectly named.
 import { generateCreativeDirections, enhanceBriefWithAI, generateProfessionalMockup, refineImageWithAI } from './services/geminiService';
 import { extractAdvancedPalette } from './utils/imageProcessor';
-import { compositeTextOnImage, finalizeWithPrecision } from './utils/canvasUtils';
+import { compositeTextOnImage, finalizeWithPrecision, applyPhotographicEffects } from './utils/canvasUtils';
 import { downloadImage, imageToBase64, formatFileSize } from './utils/helpers';
 import type { ArtDirection, CampaignResult, AspectRatio, OutputQuality } from './types';
 import { Header } from './components/Header';
@@ -119,13 +119,18 @@ const App: React.FC = () => {
             const isUltraQuality = outputQuality === 'Pro';
             let imageBase64 = await generateProfessionalMockup(logoBase64, palette, direction, creativeBrief, isUltraQuality);
             
-            let finalImageSrc = `data:image/png;base64,${imageBase64}`;
+            let processedImageUrl = `data:image/png;base64,${imageBase64}`;
             if (tagline.trim()) {
-                finalImageSrc = await compositeTextOnImage(imageBase64, tagline.trim());
+                processedImageUrl = await compositeTextOnImage(imageBase64, tagline.trim());
+            }
+
+            // Apply photographic post-processing for Pro quality
+            if (outputQuality === 'Pro') {
+                processedImageUrl = await applyPhotographicEffects(processedImageUrl);
             }
 
             const maxDim = outputQuality === 'HD' ? 2048 : 4096;
-            const finalImageUrl = await finalizeWithPrecision(finalImageSrc, aspectRatio, maxDim);
+            const finalImageUrl = await finalizeWithPrecision(processedImageUrl, aspectRatio, maxDim);
             
             setCampaignResults(prev => prev.map(r => r.id === direction.title ? { ...r, src: finalImageUrl, status: 'completed' } : r));
         } catch (e) {
